@@ -2,9 +2,9 @@
 
 ## Comparison
 
-|         | Mermaid.live                             | Beauty Mermaid                               | Beauty Mermaid ASCII       |
-| ------- | ---------------------------------------- | -------------------------------------------- | -------------------------- |
-| Preview | ![Mermaid.live](assets/mermaid-live.png) | ![Beauty Mermaid](assets/beauty-mermaid.png) | ![ASCII](assets/ascii.png) |
+| Mermaid.live                             | Beauty Mermaid                               | Beauty Mermaid ASCII       |
+| ---------------------------------------- | -------------------------------------------- | -------------------------- |
+| ![Mermaid.live](assets/mermaid-live.png) | ![Beauty Mermaid](assets/beauty-mermaid.png) | ![ASCII](assets/ascii.png) |
 
 ## How to deploy
 
