@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beautiful Mermaid Editor</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🧜‍♀️</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="navbar-left">
+        <span class="logo">🧜‍♀️</span>
+        <span class="brand">Beautiful Mermaid Editor</span>
+      </div>
+      <div class="navbar-right">
+        <div class="render-mode-toggle">
+          <button id="btn-svg" class="mode-btn active" title="SVG Output">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h4M7 12h6M7 16h4"/></svg>
+            SVG
+          </button>
+          <button id="btn-ascii" class="mode-btn" title="ASCII Output">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            ASCII
+          </button>
+        </div>
+        <button id="btn-theme" class="icon-btn" title="Toggle Theme">
+          <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Panel: Editor -->
+      <div class="panel panel-left" id="panel-left">
+        <div class="panel-header">
+          <div class="tabs">
+            <button class="tab active" data-tab="code">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Code
+            </button>
+          </div>
+        </div>
+        <div id="editor-container"></div>
+        <!-- Sample Diagrams -->
+        <div class="samples-panel">
+          <div class="samples-header">
+            <span>Sample Diagrams</span>
+          </div>
+          <div class="samples-grid">
+            <button class="sample-btn" data-sample="flowchart">Flowchart</button>
+            <button class="sample-btn" data-sample="sequence">Sequence</button>
+            <button class="sample-btn" data-sample="state">State</button>
+            <button class="sample-btn" data-sample="class">Class</button>
+            <button class="sample-btn" data-sample="er">ER</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gutter / Resizer -->
+      <div class="gutter" id="gutter"></div>
+
+      <!-- Right Panel: Preview -->
+      <div class="panel panel-right" id="panel-right">
+        <div class="panel-header preview-header">
+          <div class="preview-toolbar">
+            <button id="btn-zoom-in" class="icon-btn small" title="Zoom In">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button id="btn-zoom-out" class="icon-btn small" title="Zoom Out">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button id="btn-zoom-reset" class="icon-btn small" title="Reset Zoom">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+          <div id="theme-name" class="theme-label"></div>
+        </div>
+        <div id="preview-container">
+          <div id="preview-svg" class="preview-content"></div>
+          <pre id="preview-ascii" class="preview-content" style="display:none"></pre>
+          <div id="preview-error" class="preview-error" style="display:none"></div>
+          <div id="preview-loading" class="preview-loading" style="display:none">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-left">
+        <span id="diagram-type-badge" class="badge"></span>
+      </div>
+      <div class="footer-center">
+        <select id="theme-select" title="Diagram Theme">
+          <option value="">Default</option>
+        </select>
+      </div>
+      <div class="footer-right">
+        <span class="version">beautiful-mermaid</span>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

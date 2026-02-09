@@ -1,0 +1,6 @@
+services:
+  beauty-mermaid:
+    build: .
+    ports:
+      - "${PORT:-3000}:80"
+    restart: unless-stopped

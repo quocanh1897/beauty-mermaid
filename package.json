@@ -1,0 +1,26 @@
+{
+  "name": "beauty-mermaid",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "A beautiful mermaid diagram editor",
+  "dependencies": {
+    "@codemirror/commands": "^6.10.2",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.39.13",
+    "beautiful-mermaid": "^0.1.3",
+    "codemirror": "^6.0.2",
+    "split.js": "^1.6.5",
+    "vite": "^7.3.1"
+  }
+}
