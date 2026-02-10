@@ -12,6 +12,8 @@ let isDark = false;
 let zoomLevel = 1;
 let editor;
 let renderTimeout;
+let lastSvgString = '';
+let lastAsciiString = '';
 
 // --- DOM Elements ---
 const editorContainer = document.getElementById('editor-container');
@@ -28,6 +30,9 @@ const btnZoomReset = document.getElementById('btn-zoom-reset');
 const themeSelect = document.getElementById('theme-select');
 const themeName = document.getElementById('theme-name');
 const diagramTypeBadge = document.getElementById('diagram-type-badge');
+const btnCopy = document.getElementById('btn-copy');
+const btnDownload = document.getElementById('btn-download');
+const toastEl = document.getElementById('toast');
 const iconSun = document.getElementById('icon-sun');
 const iconMoon = document.getElementById('icon-moon');
 
@@ -122,6 +127,7 @@ async function render() {
     if (currentMode === 'svg') {
       const themeColors = currentThemeName ? THEMES[currentThemeName] : (isDark ? THEMES['tokyo-night'] : undefined);
       const svg = await renderMermaid(code, themeColors);
+      lastSvgString = svg;
       previewSvg.innerHTML = svg;
       previewSvg.style.display = 'flex';
       previewAscii.style.display = 'none';
@@ -129,6 +135,7 @@ async function render() {
       themeName.textContent = currentThemeName ? currentThemeName.replace(/-/g, ' ') : (isDark ? 'tokyo night' : 'default');
     } else {
       const ascii = renderMermaidAscii(code);
+      lastAsciiString = ascii;
       previewAscii.textContent = ascii;
       previewAscii.style.display = 'block';
       previewSvg.style.display = 'none';
@@ -205,6 +212,95 @@ document.querySelectorAll('.sample-btn').forEach(btn => {
     }
   });
 });
+
+// --- Toast ---
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 1500);
+}
+
+// --- Copy ---
+btnCopy.addEventListener('click', async () => {
+  try {
+    if (currentMode === 'svg') {
+      // Copy SVG as PNG image to clipboard
+      const svgEl = previewSvg.querySelector('svg');
+      if (!svgEl) return;
+      const blob = await svgToPngBlob(svgEl);
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      showToast('PNG copied to clipboard');
+    } else {
+      // Copy ASCII as text
+      await navigator.clipboard.writeText(lastAsciiString);
+      showToast('ASCII copied to clipboard');
+    }
+  } catch (err) {
+    showToast('Copy failed: ' + err.message);
+  }
+});
+
+// --- Download ---
+btnDownload.addEventListener('click', async () => {
+  try {
+    if (currentMode === 'svg') {
+      // Download SVG as PNG
+      const svgEl = previewSvg.querySelector('svg');
+      if (!svgEl) return;
+      const blob = await svgToPngBlob(svgEl);
+      downloadBlob(blob, 'diagram.png');
+      showToast('PNG downloaded');
+    } else {
+      // Download ASCII as text
+      const blob = new Blob([lastAsciiString], { type: 'text/plain' });
+      downloadBlob(blob, 'diagram.txt');
+      showToast('Text file downloaded');
+    }
+  } catch (err) {
+    showToast('Download failed: ' + err.message);
+  }
+});
+
+/** Convert an SVG element to a PNG Blob via canvas */
+function svgToPngBlob(svgEl) {
+  return new Promise((resolve, reject) => {
+    const svgData = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    // Scale up 2x for crisp output
+    const scale = 2;
+    const w = svgEl.viewBox?.baseVal?.width || svgEl.width?.baseVal?.value || 800;
+    const h = svgEl.viewBox?.baseVal?.height || svgEl.height?.baseVal?.value || 600;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = w * scale;
+      canvas.height = h * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() || '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob failed')), 'image/png');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('SVG image load failed')); };
+    img.src = url;
+  });
+}
+
+/** Trigger a file download from a Blob */
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 // --- Resizable Panels ---
 function initResizer() {
