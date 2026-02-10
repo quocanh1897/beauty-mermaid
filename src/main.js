@@ -1,7 +1,7 @@
-import { renderMermaid, renderMermaidAscii, THEMES } from 'beautiful-mermaid';
-import { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter, keymap } from '@codemirror/view';
+import { renderMermaid, renderMermaidAscii, THEMES } from '../lib/beautiful-mermaid/index.ts';
+import { EditorView, keymap } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { basicSetup } from 'codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { samples } from './samples.js';
 
@@ -57,11 +57,7 @@ function initEditor(initialCode) {
   if (editor) editor.destroy();
 
   const extensions = [
-    lineNumbers(),
-    highlightActiveLine(),
-    highlightActiveLineGutter(),
-    history(),
-    keymap.of([...defaultKeymap, ...historyKeymap]),
+    basicSetup,
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         scheduleRender();

@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY index.html ./
 COPY src ./src
+COPY lib ./lib
 RUN npm run build
 
 # Stage 2: Serve
